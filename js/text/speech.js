@@ -3,8 +3,6 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * This Source Code Form is "Incompatible With Secondary Licenses", as
- * defined by the Mozilla Public License, v. 2.0.
  */
 
 import config from '../data/config.js';
@@ -95,7 +93,7 @@ const updatePreferVoice = function () {
 };
 
 speech.onVoiceListChange(updatePreferVoice);
-; (async function () {
+;(async function () {
   preferVoiceUri = await config.get('speech_voice') || null;
   updatePreferVoice();
 }());
@@ -132,14 +130,21 @@ config.get('speech_rate', '1').then(rate => {
   });
 });
 
+// 修改 prepare 方法：当选中 Azure TTS 时，不直接赋值 voice，而是设置自定义标识
 speech.prepare = function (text) {
   const ssu = new SpeechSynthesisUtterance(text);
-  ssu.voice = preferVoice;
+  if (preferVoice && preferVoice.voiceURI === "azure-tts") {
+    ssu._useAzureTTS = true;  // 自定义标识，供 polyfill 识别
+    ssu.lang = preferVoice.lang;
+  } else {
+    ssu.voice = preferVoice;
+    ssu.lang = preferVoice.lang;
+  }
   ssu.rate = speechRate;
   ssu.pitch = speechPitch;
-  ssu.lang = preferVoice.lang;
   return ssu;
 };
+
 
 speech.setPreferVoice = function (voiceURI) {
   config.set('speech_voice', voiceURI);
@@ -153,4 +158,3 @@ setTimeout(() => {
     // ignore
   }
 }, 0);
-

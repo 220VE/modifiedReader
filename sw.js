@@ -62,6 +62,7 @@ const resourceList = [
   './js/page/read/index/indexsubpage.js',
   './js/page/read/index/searchpage.js',
   './js/page/read/jump/jumppage.js',
+  './js/text/azure-tts-polyfill.js',
   './js/page/read/speech/readspeech.js',
   './js/page/read/text/fliptextpage.js',
   './js/page/read/text/scrolltextpage.js',
